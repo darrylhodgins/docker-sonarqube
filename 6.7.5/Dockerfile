@@ -6,12 +6,13 @@ ENV SONAR_VERSION=6.7.5 \
     # Defaults to using H2
     SONARQUBE_JDBC_USERNAME=sonar \
     SONARQUBE_JDBC_PASSWORD=sonar \
-    SONARQUBE_JDBC_URL=
+    SONARQUBE_JDBC_URL= \
+    SONARQUBE_USER_ID=1030
 
 # Http port
 EXPOSE 9000
 
-RUN groupadd -r sonarqube && useradd -r -g sonarqube sonarqube
+RUN useradd -M -s /usr/sbin/nologin --uid ${SONARQUBE_USER_ID} --user-group sonarqube
 
 # grab gosu for easy step-down from root
 RUN set -x \
@@ -46,4 +47,6 @@ VOLUME "$SONARQUBE_HOME/data"
 
 WORKDIR $SONARQUBE_HOME
 COPY run.sh $SONARQUBE_HOME/bin/
+RUN set -x \
+    && chmod +x $SONARQUBE_HOME/bin/run.sh
 ENTRYPOINT ["./bin/run.sh"]
